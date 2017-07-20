@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-        <!ELEMENT account (owner,password,balance)>
-        <!ELEMENT owner (#PCDATA)>
-        <!ELEMENT password (#PCDATA)>
-        <!ELEMENT balance (#PCDATA)>
