@@ -1,0 +1,227 @@
+//        for (Account acc : accounts) {
+//            Document dom;
+//            Element e = null;
+//
+//            // instance of a DocumentBuilderFactory
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            try {
+//                // use factory to get an instance of document builder
+//                DocumentBuilder db = dbf.newDocumentBuilder();
+//                // create instance of DOM
+//                dom = db.newDocument();
+//
+//                // create the root element
+//                Element rootEle = dom.createElement("account");
+//
+//                // create data elements and place them under root
+//                e = dom.createElement("owner");
+//                e.appendChild(dom.createTextNode(acc.getName()));
+//                rootEle.appendChild(e);
+//
+//                e = dom.createElement("password");
+//                e.appendChild(dom.createTextNode(acc.getPass()));
+//                rootEle.appendChild(e);
+//
+//                e = dom.createElement("balance");
+//                e.appendChild(dom.createTextNode(Double.toString(acc.getBalance())));
+//                rootEle.appendChild(e);
+//
+//                dom.appendChild(rootEle);
+//
+//                try {
+//                    Transformer tr = TransformerFactory.newInstance().newTransformer();
+//                    tr.setOutputProperty(OutputKeys.INDENT, "yes");
+//                    tr.setOutputProperty(OutputKeys.METHOD, "xml");
+//                    tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+////                tr.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "roles.dtd");
+//                    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+//
+//                    // send DOM to file
+//                    tr.transform(new DOMSource(dom),
+//                            new StreamResult(new FileOutputStream(xml)));
+//
+//                } catch (TransformerException te) {
+//                    System.out.println(te.getMessage());
+//                } catch (IOException ioe) {
+//                    System.out.println(ioe.getMessage());
+//                }
+//            } catch (ParserConfigurationException pce) {
+//                System.out.println("UsersXML: Error trying to instantiate DocumentBuilder " + pce);
+//            }
+//        }
+//    }
+
+    public boolean readXML(String xml) throws ParserException {
+        //TODO right now it only parses through one element in accounts.xml
+        String XMLowner = "";
+        String XMLpassword = "";
+        String XMLbalance = "";
+
+        String owner;
+        String password;
+        double balance;
+
+        Document dom;
+
+        try {
+            // Make an  instance of the DocumentBuilderFactory
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            // use the factory to take an instance of the document builder
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            // parse using the builder to get the DOM mapping of the
+            // XML file
+            dom = db.parse(xml);
+
+            Element doc = dom.getDocumentElement();
+            NodeList elements = doc.getElementsByTagName("accounts");
+
+            for (int temp = 0; temp < elements.getLength(); temp++) {
+
+
+                XMLowner = getTextValue(XMLowner, doc, "owner");
+                if (!XMLowner.equals("")) {
+                    owner = XMLowner;
+                    XMLowner = "";
+                } else {
+                    throw new ParserException("Parsing Error");
+                }
+
+                XMLpassword = getTextValue(XMLpassword, doc, "password");
+                if (!XMLpassword.equals("")) {
+                    password = XMLpassword;
+                    XMLpassword = "";
+                } else {
+                    throw new ParserException("Parsing Error");
+                }
+
+                XMLbalance = getTextValue(XMLbalance, doc, "balance");
+                if (!XMLbalance.equals("")) {
+                    balance = Double.parseDouble(XMLbalance);
+                    XMLbalance = "";
+                } else {
+                    throw new ParserException("Parsing Error");
+                }
+
+                try {
+                    Account newAccount = new Account(owner, password);
+                    newAccount.depositMoney(balance);
+                    this.addAccount(newAccount);
+                } catch (IllegalValueException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+
+        } catch (ParserConfigurationException pce) {
+            System.out.println(pce.getMessage());
+        } catch (SAXException se) {
+            System.out.println(se.getMessage());
+        } catch (IOException ioe) {
+            System.err.println(ioe.getMessage());
+        }
+
+        return false;
+    }
+
+
+
+    public boolean readXML(String xml) throws ParserException {
+            //TODO right now it only parses through one element in accounts.xml
+            String XMLowner = "";
+            String XMLpassword = "";
+            String XMLbalance = "";
+
+            String owner;
+            String password;
+            double balance;
+
+    //        Document dom;
+
+            try {
+                // Make an  instance of the DocumentBuilderFactory
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                // use the factory to take an instance of the document builder
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                // parse using the builder to get the DOM mapping of the
+                // XML file
+                Document dom = db.parse(xml);
+
+                dom.getDocumentElement().normalize();
+                NodeList nList = dom.getElementsByTagName("account");
+
+                for (int i = 0; i < nList.getLength(); i++){
+                    Node nNode = nList.item(i);
+
+                }
+
+
+
+
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        public void writeXML() {
+                //TODO: doesnt overwrite the previous elements
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = null;
+                Document document = null;
+                try {
+                    String filepath = "accounts.xml";
+                    documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                    document = documentBuilder.parse("accounts.xml");
+                    Node root = document.getFirstChild();
+
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Element root = document.getDocumentElement();
+
+
+                for (Account acc: accounts) {
+                    Element newAccount = document.createElement("account");
+
+                    Element owner = document.createElement("owner");
+                    owner.appendChild(document.createTextNode(acc.getName()));
+                    newAccount.appendChild(owner);
+
+                    Element password = document.createElement("password");
+                    password.appendChild(document.createTextNode(acc.getPass()));
+                    newAccount.appendChild(password);
+
+                    Element balance = document.createElement("balance");
+                    balance.appendChild(document.createTextNode(Double.toString(acc.getBalance())));
+                    newAccount.appendChild(balance);
+
+                    root.appendChild(newAccount);
+                }
+
+                DOMSource source = new DOMSource(document);
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer;
+                try {
+                    transformer = transformerFactory.newTransformer();
+                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                    StreamResult result = new StreamResult("accounts.xml");
+                    transformer.transform(source, result);
+                } catch (TransformerConfigurationException e) {
+                    e.printStackTrace();
+                } catch (TransformerException e) {
+                    e.printStackTrace();
+                }
+            }
